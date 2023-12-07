@@ -5,7 +5,7 @@ from video_processor import VideoProcessor
 
 if __name__ == '__main__':
     video_path = 'dataset/road_video001.mp4'
-    output_path = 'outputs/solid.mp4'
+    output_path = 'outputs/road_video001.mp4'
     
     # Carrega o vídeo
     video = Video(video_path)
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     
     '''
     # Processa um vídeo
-    video_processor = VideoProcessor(video, tracker, counter, 'outputs/road_video001_linha.mp4', start, end) # Não passando start e end para obter a contagem global
+    video_processor = VideoProcessor(video, tracker, counter, 'outputs/road_video001_linha.mp4', start, end)
     video_processor.process()
     '''
     

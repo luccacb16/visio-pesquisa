@@ -4,19 +4,14 @@
 
 
 ## Descrição
-Através de uma fila do RabbitMQ, o programa recebe um arquivo JSON de keys
-- video_ref: nome do arquivo de vídeo;
-- op_type: operações que serão realizadas;
-- frame_second_index: tempo de vídeo do qual o frame é extraído.
-
-Em seguida extrai e processa o frame especificado
+O programa recebe um vídeo de uma rodovia e conta quantos veículos passaram por ela.
 
 ## Exemplos
-<img src="https://gitlab.com/luccacb16/dataaugmentation/uploads/7d5c75eea85d77c0b363af6df787e9f6/2.jpg" height=250>
+<img src="./media/road_video001.gif" width="640" height="360" />
 
-<img src="https://gitlab.com/luccacb16/dataaugmentation/uploads/07e002e53544ca705c52801bf426ed17/9.jpg" height=250>
+<img src="./media/road_video001_output.gif" width="640" height="360" />
 
-<img src="https://gitlab.com/luccacb16/dataaugmentation/uploads/ba39e60150b961ce9ce34faacc0f1e6a/20.jpg" height=250>
+<img src="./media/road_video001_output_linha.gif" width="640" height="360" />
 
 ## Setup
 Clone o repositório para sua máquina
@@ -45,24 +40,28 @@ from counter import Counter
 from video_processor import VideoProcessor
 ```
 
-Instancie um objeto dessa classe, passando os parâmetros host, port, username, password, queue 
+Instancie um objeto de cada classe, passando os parâmetros necessários. Você pode também definir dois pontos para a linha de contagem.
 ```
-augmenter = Augmenter(host, port, username, password, queue)
+video_path = 'dataset/road_video001.mp4'
+output_path = 'outputs/road_video001.mp4'
+
+video = Video(video_path)
+
+tracker = Tracker('yolov8n.pt', classes=[2, 7], tracker='bytetrack.yaml')
+
+counter = Counter()
+
+start = (0, int(video.HEIGHT * 2/3))
+end = (video.WIDTH, int(video.HEIGHT * 2/3))
+
+video_processor = VideoProcessor(video, tracker, counter, 'outputs/road_video001_linha.mp4', start, end)
 ```
 
-Chame a função .process() do objeto
+Chame a função .process() do objeto de VideoProcessor
 ```
-augmenter.process()
+video_processor.process()
 ```
 
-As imagens serão salvas no diretório 'imgs/', que será criado automaticamente, caso não exista
+Não passar os atributos 'start' e 'end' fará com que a contagem seja global, ou seja, todos os veículos que forem detectados serão contabilizados.
 
-Para um teste rápido, instale o software de mensageria por fila RabbitMQ, disponível no site <https://www.rabbitmq.com/>
-
-**É importante que os vídeos estejam em uma pasta 'videos' no mesmo diretório do arquivo test.py**
-
-Você pode executar o arquivo test.py, acessando o diretório 'src' do projeto e executando
-```
-py test.py
-```
-Os parâmetros de conexão com o RabbitMQ já estão definidos, mas você pode mudá-los. Basta abrir o arquivo test.py e fazer as alterações que desejar
+Um exemplo com esse código pode ser encontrado em /scripts/example.py. Basta mover o diretório dataset/ e o arquivo para o diretório src/ e executá-lo.

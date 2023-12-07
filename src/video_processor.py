@@ -5,10 +5,10 @@ import time
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # Ignorar warnings do TensorFlow sobre CUDA
 
-from counter import *
-from tracker import *
-from video import *
-from point import *
+from counter import Counter
+from tracker import Tracker
+from video import Video
+from point import Point
 
 class VideoProcessor:
     '''
@@ -39,9 +39,12 @@ class VideoProcessor:
         
         self._out = cv2.VideoWriter(self._output_path, cv2.VideoWriter_fourcc(*'mp4v'), self._video.FPS, (self._video.WIDTH, self._video.HEIGHT))
         
-    def process(self) -> None:
+    def process(self, show: bool = False) -> None:
         '''
         Processa o vídeo, rastreando e contando objetos.
+        
+        Args:
+            - show (bool): Exibe o vídeo processado em tempo real.
         '''
         # Inicia o contador de tempo
         start_time = time.time()
@@ -74,7 +77,15 @@ class VideoProcessor:
             cv2.putText(annotated_frame, f'Veiculos: {self._counter.count}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             
             self._out.write(annotated_frame)
+            
+            # Exibe o vídeo processado
+            if show:
+                cv2.imshow(self._video.PATH, annotated_frame)
+                if cv2.waitKey(1) & 0xFF == ord('q'): break
 
+        if show:
+            cv2.destroyAllWindows()
+        
         self._video.release()
         self._out.release()
         
